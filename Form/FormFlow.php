@@ -12,6 +12,7 @@ use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormTypeInterface;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
 
 /**
  * @author Christian Raue <christian.raue@gmail.com>
@@ -33,6 +34,7 @@ class FormFlow {
 	/**
 	 * @var FormFactoryInterface
 	 */
+	protected $formFactory;
 
 	/**
 	 * @var StorageInterface
@@ -63,6 +65,11 @@ class FormFlow {
 	 * @var string
 	 */
 	protected $stepDataKey;
+
+    /**
+     * @var RequestStack
+     */
+	private $requestStack = null;
 
 	/**
 	 * @var string
@@ -104,8 +111,6 @@ class FormFlow {
 	 */
 	protected $dynamicStepNavigationParameter = 'step';
 
-	protected $formFactory;
-
 	/**
 	 * @var Request
 	 */
@@ -118,11 +123,9 @@ class FormFlow {
 		$this->formFactory = $formFactory;
 	}
 
-	/**
-	 * @param Request $request (Optional.)
-	 */
-	public function setRequest(Request $request = null) {
-		$this->request = $request;
+    public function setRequestStack(RequestStack $requestStack)
+    {
+        $this->requestStack = $requestStack;
 	}
 
 	/**
@@ -130,11 +133,12 @@ class FormFlow {
 	 * @throws \RuntimeException If the request is not available.
 	 */
 	public function getRequest() {
-		if ($this->request === null) {
-			throw new \RuntimeException('The request is not available.');
-		}
+	    $request = $this->requestStack->getCurrentRequest();
+	    if (!$request) {
+	        throw new \RuntimeException('The request is not available.');
+        }
 
-		return $this->request;
+        return $request;
 	}
 
 	/**
@@ -164,7 +168,7 @@ class FormFlow {
 	public function setFormType(FormTypeInterface $formType) {
 		$this->formType = $formType;
 		if (empty($this->id)) {
-			$this->id = 'flow_' . $this->formType->getName();
+			$this->id = 'flow_' . $this->formType->getBlockPrefix();
 		}
 		if (empty($this->validationGroupPrefix)) {
 			$this->validationGroupPrefix = $this->id. '_step';
@@ -427,7 +431,7 @@ class FormFlow {
 	public function saveCurrentStepData() {
 		$stepData = $this->retrieveStepData();
 
-		$stepData[$this->currentStep] = $this->getRequest()->request->get($this->formType->getName(), array());
+		$stepData[$this->currentStep] = $this->getRequest()->request->get($this->formType->getBlockPrefix(), array());
 
 		$this->saveStepData($stepData);
 	}
@@ -461,7 +465,7 @@ class FormFlow {
 			if ($this->isStepDone($step)) {
 				if (array_key_exists($step, $stepData)) {
 					$stepForm = $this->createFormForStep($formData, $step, $options);
-					$stepForm->bind($stepData[$step]);
+					$stepForm->submit($stepData[$step]);
 
 					if ($this->hasListeners(FormFlowEvents::POST_BIND_SAVED_DATA)) {
 						$event = new PostBindSavedDataEvent($this, $formData, $step);
@@ -523,7 +527,7 @@ class FormFlow {
 			self::TRANSITION_BACK,
 			self::TRANSITION_RESET,
 		))) {
-			$form->submit($this->getRequest());
+		    $form->handleRequest($this->getRequest());
 
 			if ($this->hasListeners(FormFlowEvents::POST_BIND_REQUEST)) {
 				$event = new PostBindRequestEvent($this, $form->getData(), $this->currentStep);
@@ -560,7 +564,7 @@ class FormFlow {
 
 		$options = $this->getFormOptions($formData, $step, $options);
 
-		return $this->formFactory->create($this->formType, $formData, $options);
+		return $this->formFactory->create(get_class($this->formType), $formData, $options);
 	}
 
 	/**

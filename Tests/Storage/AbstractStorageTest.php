@@ -11,8 +11,8 @@ use Craue\FormFlowBundle\Storage\StorageInterface;
  * @copyright 2011-2013 Christian Raue
  * @license http://www.opensource.org/licenses/mit-license.php MIT License
  */
-abstract class AbstractStorageTest extends \PHPUnit_Framework_TestCase {
-
+abstract class AbstractStorageTest extends \PHPUnit_Framework_TestCase
+{
 	/**
 	 * @var StorageInterface
 	 */
@@ -21,7 +21,8 @@ abstract class AbstractStorageTest extends \PHPUnit_Framework_TestCase {
 	/**
 	 * {@inheritDoc}
 	 */
-	protected function setUp() {
+	protected function setUp()
+    {
 		$this->storage = $this->getStorageImplementation();
 	}
 
@@ -50,5 +51,4 @@ abstract class AbstractStorageTest extends \PHPUnit_Framework_TestCase {
 		$this->storage->set('foo', 'bar');
 		$this->assertEquals('bar', $this->storage->remove('foo'));
 	}
-
 }

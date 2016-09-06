@@ -3,6 +3,7 @@
 namespace Craue\FormFlowBundle\Tests;
 
 use Craue\FormFlowBundle\Tests\IntegrationTestCase;
+use Symfony\Component\HttpFoundation\RequestStack;
 
 /**
  * @group integration
@@ -65,13 +66,13 @@ class Demo1FlowTest extends IntegrationTestCase {
 
 	protected function getCalledEvents() {
 		$container = static::$kernel->getContainer();
-		$container->enterScope('request');
-		$container->set('request', $this->client->getRequest(), 'request');
+		$requestStack = new RequestStack();
+		$requestStack->push($this->client->getRequest());
+		$container->set('request_stack', $requestStack);
 
 		$flow = $container->get('integrationTestBundle.form.flow.demo1');
 		$storage = $container->get('craue.form.flow.storage');
 
 		return $storage->get($flow->getCalledEventsSessionKey());
 	}
-
 }

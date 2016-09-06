@@ -2,6 +2,7 @@
 
 namespace Craue\FormFlowBundle\Storage;
 
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 
 /**
@@ -11,43 +12,82 @@ use Symfony\Component\HttpFoundation\Session\SessionInterface;
  * @copyright 2011-2013 Christian Raue
  * @license http://www.opensource.org/licenses/mit-license.php MIT License
  */
-class SessionStorage implements StorageInterface {
+class SessionStorage implements StorageInterface
+{
+    /**
+     * @var RequestStack
+     */
+    private $requestStack;
 
-	/**
-	 * @var SessionInterface
+    /**
+     * @param RequestStack $requestStack
+     */
+    public function __construct(RequestStack $requestStack)
+    {
+        $this->requestStack = $requestStack;
+    }
+
+    /**
+	 * {@inheritDoc}
 	 */
-	protected $session;
-
-	public function __construct(SessionInterface $session) {
-		$this->session = $session;
+	public function set($key, $value)
+    {
+        $session = $this->getSession();
+        if (!$session) {
+            return;
+        }
+		$session->set($key, $value);
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
-	public function set($key, $value) {
-		$this->session->set($key, $value);
+	public function get($key, $default = null)
+    {
+        $session = $this->getSession();
+        if (!$session) {
+            return null;
+        }
+
+		return $session->get($key, $default);
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
-	public function get($key, $default = null) {
-		return $this->session->get($key, $default);
+	public function has($key)
+    {
+        $session = $this->getSession();
+        if (!$session) {
+            return false;
+        }
+
+		return $session->has($key);
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
-	public function has($key) {
-		return $this->session->has($key);
+	public function remove($key)
+    {
+        $session = $this->getSession();
+        if (!$session) {
+            return null;
+        }
+
+		return $session->remove($key);
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
-	public function remove($key) {
-		return $this->session->remove($key);
-	}
+    /**
+     * @return SessionInterface|null
+     */
+    private function getSession()
+    {
+        $request = $this->requestStack->getCurrentRequest();
+        if (!$request) {
+            return null;
+        }
 
+        return $request->getSession();
+	}
 }
