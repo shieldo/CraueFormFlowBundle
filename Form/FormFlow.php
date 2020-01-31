@@ -162,6 +162,15 @@ class FormFlow {
 		$this->eventDispatcher = $eventDispatcher;
 	}
 
+    private function getEventDispatcher(): EventDispatcherInterface
+    {
+        if ($this->eventDispatcher === null) {
+            throw new \LogicException('Event dispatcher was not set on the form flow.');
+        }
+
+        return $this->eventDispatcher;
+	}
+
 	/**
 	 * @param FormTypeInterface $formType
 	 */
@@ -297,9 +306,9 @@ class FormFlow {
 	}
 
 	/**
-	 * @param integer $step Assumed step to which skipped steps shall be applied to.
-	 * @param integer $direction Either 1 (to skip forwards) or -1 (to skip backwards).
-	 * @return integer Target step with skipping applied.
+	 * @param int $step Assumed step to which skipped steps shall be applied to.
+	 * @param int $direction Either 1 (to skip forwards) or -1 (to skip backwards).
+	 * @return int Target step with skipping applied.
 	 */
 	public function applySkipping($step, $direction = 1) {
 		if ($direction !== 1 && $direction !== -1) {
@@ -355,6 +364,9 @@ class FormFlow {
 		return $this->transition;
 	}
 
+    /**
+     * @return int
+     */
 	public function getRequestedStep() {
 		$defaultStep = 1;
 
@@ -391,7 +403,7 @@ class FormFlow {
 	public function bind($formData) {
 		if ($this->hasListeners(FormFlowEvents::PRE_BIND)) {
 			$event = new PreBindEvent($this);
-			$this->eventDispatcher->dispatch(FormFlowEvents::PRE_BIND, $event);
+			$this->getEventDispatcher()->dispatch(FormFlowEvents::PRE_BIND, $event);
 		}
 
 		if (!$this->allowDynamicStepNavigation && $this->getRequest()->isMethod('GET')) {
@@ -469,7 +481,7 @@ class FormFlow {
 
 					if ($this->hasListeners(FormFlowEvents::POST_BIND_SAVED_DATA)) {
 						$event = new PostBindSavedDataEvent($this, $formData, $step);
-						$this->eventDispatcher->dispatch(FormFlowEvents::POST_BIND_SAVED_DATA, $event);
+						$this->getEventDispatcher()->dispatch(FormFlowEvents::POST_BIND_SAVED_DATA, $event);
 					}
 				}
 			}
@@ -531,13 +543,13 @@ class FormFlow {
 
 			if ($this->hasListeners(FormFlowEvents::POST_BIND_REQUEST)) {
 				$event = new PostBindRequestEvent($this, $form->getData(), $this->currentStep);
-				$this->eventDispatcher->dispatch(FormFlowEvents::POST_BIND_REQUEST, $event);
+				$this->getEventDispatcher()->dispatch(FormFlowEvents::POST_BIND_REQUEST, $event);
 			}
 
 			if ($form->isValid()) {
 				if ($this->hasListeners(FormFlowEvents::POST_VALIDATE)) {
 					$event = new PostValidateEvent($this, $form->getData());
-					$this->eventDispatcher->dispatch(FormFlowEvents::POST_VALIDATE, $event);
+					$this->getEventDispatcher()->dispatch(FormFlowEvents::POST_VALIDATE, $event);
 				}
 
 				return true;

@@ -3,6 +3,8 @@
 namespace Craue\FormFlowBundle\Twig\Extension;
 
 use Craue\FormFlowBundle\Form\FormFlow;
+use Twig\Extension\AbstractExtension;
+use Twig\TwigFilter;
 
 /**
  * Twig extension for form flows.
@@ -11,7 +13,7 @@ use Craue\FormFlowBundle\Form\FormFlow;
  * @copyright 2011-2013 Christian Raue
  * @license   http://opensource.org/licenses/mit-license.php MIT License
  */
-class FormFlowExtension extends \Twig_Extension
+class FormFlowExtension extends AbstractExtension
 {
 
     /**
@@ -28,11 +30,11 @@ class FormFlowExtension extends \Twig_Extension
     public function getFilters()
     {
         return [
-            new \Twig_SimpleFilter(
+            new TwigFilter(
                 'craue_addDynamicStepNavigationParameter',
                 [$this, 'addDynamicStepNavigationParameter']
             ),
-            new \Twig_SimpleFilter(
+            new TwigFilter(
                 'craue_removeDynamicStepNavigationParameter',
                 [$this, 'removeDynamicStepNavigationParameter']
             ),

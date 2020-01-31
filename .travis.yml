@@ -1,11 +1,11 @@
 language: php
 php:
-  - 7.0
   - 7.1
-env:
-  - SYMFONY_VERSION="2.8.*" MIN_STABILITY="stable"
+  - 7.2
+  - 7.3
+  - 7.4
+
 before_script:
   - sh travis_before_build.sh
 script:
-  - vendor/phpunit/phpunit/phpunit --debug
-  - vendor/bin/phpstan analyse -c phpstan.neon -l 6 .
+  - vendor/phpstan/phpstan/phpstan analyse -c phpstan.neon -l 8 .

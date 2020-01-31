@@ -3,4 +3,11 @@ parameters:
         - %currentWorkingDirectory%/Test/*
         - %currentWorkingDirectory%/Tests/*
         - %currentWorkingDirectory%/DependencyInjection/Configuration.php
+        - %currentWorkingDirectory%/var/*
         - %currentWorkingDirectory%/vendor/*
+    ignoreErrors:
+        - '#has no return typehint specified#'
+        - '#with no typehint specified#'
+        - '#EventDispatcherInterface::dispatch\(\) invoked with 2 parameters, 1 required#'
+        - '#EventDispatcherInterface::dispatch\(\) expects object, string given#'
+    checkMissingIterableValueType: false
