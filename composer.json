@@ -16,21 +16,18 @@
 		}
 	],
 	"require": {
-		"php": ">=5.5",
-		"symfony/framework-bundle": "^2.8|^3",
-		"symfony/form": "^2.8|^3"
+		"php": ">=7.1",
+		"symfony/framework-bundle": "^3.4|^4",
+		"symfony/form": "^3.4|^4"
 	},
 	"require-dev": {
-		"doctrine/common": "~2.3@stable",
-		"phpunit/phpunit": "~3.7.10@stable",
-		"sensio/framework-extra-bundle": "^3.0.11|^4",
-		"symfony/symfony": "^2.8|^3",
-		"phpstan/phpstan": "^0.8"
+		"doctrine/common": "^2",
+		"symfony/symfony": "^3.4|^4",
+		"phpstan/phpstan": "^0.12"
 	},
-	"minimum-stability": "stable",
 	"autoload": {
-		"psr-0": {
-			"Craue\\FormFlowBundle": ""
+		"psr-4": {
+			"Craue\\FormFlowBundle\\": ""
 		}
 	},
 	"target-dir": "Craue/FormFlowBundle"
